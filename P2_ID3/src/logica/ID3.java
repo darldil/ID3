@@ -5,13 +5,13 @@ import java.util.List;
 
 import dao.LectorFicheros;
 
-public class Algoritmo {
+public class ID3 {
 
 	private LectorFicheros dao;
 	private ArrayList<String> ListaAtributos;
 	private ArrayList<ArrayList<String>> ListaEjemplos;
 	
-	public Algoritmo() {
+	public ID3() {
 		dao = new LectorFicheros();
 		ListaAtributos = new ArrayList<String>();
 		ListaEjemplos = new ArrayList<ArrayList<String>>();
@@ -36,7 +36,7 @@ public class Algoritmo {
 			temp.add(list.get(i));
 			n++;
 		}
-		//ListaEjemplos.addAll(list);
+		ListaEjemplos.add(temp);
 		System.out.println(ListaEjemplos);
 	}
 	

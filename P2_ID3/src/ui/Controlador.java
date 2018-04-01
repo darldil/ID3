@@ -1,13 +1,13 @@
 package ui;
 
-import logica.Algoritmo;
+import logica.ID3;
 import logica.TransferArchivos;
 
 public class Controlador {
 	
 	private WindowController ui;
 	private Estados state;
-	private Algoritmo algoritmo;
+	private ID3 algoritmo;
 
 	public Estados getState() {
 		return state;
@@ -17,7 +17,7 @@ public class Controlador {
 		this.state = state;
 	}
 
-	public void setAlgoritmo(Algoritmo algoritmo) {
+	public void setAlgoritmo(ID3 algoritmo) {
 		this.algoritmo = algoritmo;
 	}
 
@@ -34,7 +34,7 @@ public class Controlador {
 				break;
 			case LEER_JUEGO: 
 				algoritmo.cargarDatos((TransferArchivos)datos); 
-				setState(Estados.LEER_JUEGO);
+				setState(Estados.PROCESAR);
 				break;
 			default: break;
 		}
