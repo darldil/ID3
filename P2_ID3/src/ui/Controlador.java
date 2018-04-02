@@ -35,6 +35,11 @@ public class Controlador {
 			case LEER_JUEGO: 
 				algoritmo.cargarDatos((TransferArchivos)datos); 
 				setState(Estados.PROCESAR);
+				this.accion(null); //MODIFICAR ESTO!
+				break;
+			case PROCESAR:
+				algoritmo.procesar();
+				setState(Estados.FIN);
 				break;
 			default: break;
 		}

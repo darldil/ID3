@@ -1,7 +1,9 @@
 package logica;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import dao.LectorFicheros;
 
@@ -38,6 +40,18 @@ public class ID3 {
 		}
 		ListaEjemplos.add(temp);
 		System.out.println(ListaEjemplos);
+	}
+	
+	public void procesar() {
+		Map<String, Float> meritos = new HashMap<String, Float>(); 
+		for (int i = 0; i < this.ListaAtributos.size(); i++) {
+			//Map<String, Float> temp = new HashMap<String, Float>();
+			meritos.put(ListaAtributos.get(i), calcularMerito(i));
+		}
+	}
+	
+	private float calcularMerito(int col) {
+		return 0;
 	}
 	
 }
