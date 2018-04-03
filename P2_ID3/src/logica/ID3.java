@@ -52,6 +52,7 @@ public class ID3 {
 	
 	private float calcularMerito(int col) {
 		ArrayList<String> tipo = new ArrayList<String>();
+		ArrayList<Float> resultadosInfor = new ArrayList<Float>();
 		int totalMeritos = ListaEjemplos.size();
 		Map<String, Float> mapaMeritos = new HashMap<String, Float>();
 		float resultado = 0;
@@ -64,6 +65,23 @@ public class ID3 {
 				float temp = mapaMeritos.get(ListaEjemplos.get(i).get(col));
 				mapaMeritos.put(ListaEjemplos.get(i).get(col), temp + 1);
 			}
+		}
+		
+		for (int n = 0; n < mapaMeritos.size(); n++) {
+			Map<String, Float> temp = new HashMap<String, Float>();
+			temp.put("si", (float) 0);
+			temp.put("no", (float) 0);
+			for (int i = 0; i < totalMeritos; i++) {
+				float aux = mapaMeritos.get(ListaEjemplos.get(i).get(ListaEjemplos.get(i).size()-1));
+				mapaMeritos.put(ListaEjemplos.get(i).get(ListaEjemplos.get(i).size()-1), aux + 1);
+			}
+			float merito = (float) ((mapaMeritos.get(tipo.get(n))/totalMeritos) * (-temp.get("si")* Math.log(temp.get("si"))/Math.log(2)) -
+					temp.get("no")* Math.log(temp.get("no"))/Math.log(2)); 
+			resultadosInfor.add(merito);
+		}
+		
+		for (int i = 0; i < resultadosInfor.size(); i++) {
+			resultado += resultadosInfor.get(i);
 		}
 		
 		return resultado;
