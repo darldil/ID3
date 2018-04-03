@@ -72,8 +72,8 @@ public class ID3 {
 			temp.put("si", (float) 0);
 			temp.put("no", (float) 0);
 			for (int i = 0; i < totalMeritos; i++) {
-				float aux = mapaMeritos.get(ListaEjemplos.get(i).get(ListaEjemplos.get(i).size()-1));
-				mapaMeritos.put(ListaEjemplos.get(i).get(ListaEjemplos.get(i).size()-1), aux + 1);
+				float aux = temp.get(ListaEjemplos.get(i).get((ListaEjemplos.get(i).size())-1));
+				temp.put(ListaEjemplos.get(i).get(ListaEjemplos.get(i).size()-1), aux + 1);
 			}
 			float merito = (float) ((mapaMeritos.get(tipo.get(n))/totalMeritos) * (-temp.get("si")* Math.log(temp.get("si"))/Math.log(2)) -
 					temp.get("no")* Math.log(temp.get("no"))/Math.log(2)); 
