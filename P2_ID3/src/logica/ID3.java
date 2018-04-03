@@ -51,7 +51,22 @@ public class ID3 {
 	}
 	
 	private float calcularMerito(int col) {
-		return 0;
+		ArrayList<String> tipo = new ArrayList<String>();
+		int totalMeritos = ListaEjemplos.size();
+		Map<String, Float> mapaMeritos = new HashMap<String, Float>();
+		float resultado = 0;
+		
+		for (int i = 0; i < totalMeritos; i++) {
+			if (!tipo.contains(ListaEjemplos.get(i).get(col))) {
+				tipo.add(ListaEjemplos.get(i).get(col));
+				mapaMeritos.put(ListaEjemplos.get(i).get(col), (float) 1);
+			} else {
+				float temp = mapaMeritos.get(ListaEjemplos.get(i).get(col));
+				mapaMeritos.put(ListaEjemplos.get(i).get(col), temp + 1);
+			}
+		}
+		
+		return resultado;
 	}
 	
 }
