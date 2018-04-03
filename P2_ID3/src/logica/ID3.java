@@ -1,6 +1,7 @@
 package logica;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,11 +13,13 @@ public class ID3 {
 	private LectorFicheros dao;
 	private ArrayList<String> ListaAtributos;
 	private ArrayList<ArrayList<String>> ListaEjemplos;
+	private Map<String, ArrayList<Map>> resultado;
 	
 	public ID3() {
 		dao = new LectorFicheros();
 		ListaAtributos = new ArrayList<String>();
 		ListaEjemplos = new ArrayList<ArrayList<String>>();
+		resultado = new HashMap<String, ArrayList<Map>>();
 	}
 	
 	public void cargarTipos(TransferArchivos transfer) throws Exception {
@@ -48,7 +51,12 @@ public class ID3 {
 			//Map<String, Float> temp = new HashMap<String, Float>();
 			meritos.put(ListaAtributos.get(i), calcularMerito(i));
 		}
-	}
+		
+		siguienteRama(getMinKey(meritos));
+		
+		/*resultado.put(getMinKey(meritos), Collections.min(meritos.values()));
+		Float temp = Collections.min(meritos.values());*/
+	} 
 	
 	private float calcularMerito(int col) {
 		ArrayList<String> tipo = new ArrayList<String>();
@@ -72,11 +80,18 @@ public class ID3 {
 			temp.put("si", (float) 0);
 			temp.put("no", (float) 0);
 			for (int i = 0; i < totalMeritos; i++) {
-				float aux = temp.get(ListaEjemplos.get(i).get((ListaEjemplos.get(i).size())-1));
-				temp.put(ListaEjemplos.get(i).get(ListaEjemplos.get(i).size()-1), aux + 1);
+				if (tipo.get(n).equals(ListaEjemplos.get(i).get(col))) {
+					float aux = temp.get(ListaEjemplos.get(i).get((ListaEjemplos.get(i).size())-1));
+					temp.put(ListaEjemplos.get(i).get(ListaEjemplos.get(i).size()-1), aux + 1);
+				}
 			}
-			float merito = (float) ((mapaMeritos.get(tipo.get(n))/totalMeritos) * (-temp.get("si")* Math.log(temp.get("si"))/Math.log(2)) -
-					temp.get("no")* Math.log(temp.get("no"))/Math.log(2)); 
+			float pi = (temp.get("si")/mapaMeritos.get(tipo.get(n)));
+			float ni = (temp.get("no")/mapaMeritos.get(tipo.get(n)));
+			float log1 = (float) (Math.log(pi)/(Math.log(2)));
+			float log2 = (float) (Math.log(ni)/(Math.log(2)));
+			Float merito = (mapaMeritos.get(tipo.get(n))/totalMeritos) * ((-pi * log1) + (-ni * log2)); 
+			if (merito.equals(Float.NaN))
+				merito = (float) 0;
 			resultadosInfor.add(merito);
 		}
 		
@@ -85,6 +100,23 @@ public class ID3 {
 		}
 		
 		return resultado;
+	}
+	
+	private String getMinKey(Map<String, Float> map) {
+	    String minKey = null;
+	    float minValue = Float.MAX_VALUE;
+	    for(String key: ListaAtributos) {
+	        float value = map.get(key);
+	        if(value < minValue) {
+	            minValue = value;
+	            minKey = key;
+	        }
+	    }
+	    return minKey;
+	}
+	
+	private void siguienteRama(String ramaActual) {
+		
 	}
 	
 }
