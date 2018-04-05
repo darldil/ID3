@@ -26,7 +26,7 @@ public class ID3 {
 	public void cargarTipos(TransferArchivos transfer) throws Exception {
 		List<String> list = dao.leerTipos(transfer.getRuta() + transfer.getNombre());
 		ListaAtributos.addAll(list);
-		System.out.println(ListaAtributos);
+		//System.out.println(ListaAtributos);
 	}
 	
 	public void cargarDatos(TransferArchivos transfer) throws Exception {
@@ -43,7 +43,11 @@ public class ID3 {
 			n++;
 		}
 		ListaEjemplos.add(temp);
-		System.out.println(ListaEjemplos);
+		//System.out.println(ListaEjemplos);
+	}
+	
+	public Nodo getNodoResultado() {
+		return this.resultado;
 	}
 	
 	public void procesar() {
@@ -60,13 +64,11 @@ public class ID3 {
 			siguienteRama(getMinKey(meritos), vuelta);
 			ListaMeritos.add(getMinKey(meritos));
 			vuelta++;
-			if (vuelta == ListaAtributos.size() - 2) {
+			/*if (vuelta == ListaAtributos.size() - 2) {
 				int i = 0;
 				System.out.println(i);
-			}
+			}*/
 		}
-		
-		int fin = 0;
 		
 		/*resultado.put(getMinKey(meritos), Collections.min(meritos.values()));
 		Float temp = Collections.min(meritos.values());*/
@@ -91,19 +93,29 @@ public class ID3 {
 		
 		for (int n = 0; n < mapaMeritos.size(); n++) {
 			Map<String, Float> temp = new HashMap<String, Float>();
-			temp.put("si", (float) 0);
-			temp.put("no", (float) 0);
+			for (ArrayList<String> fila: ListaEjemplos) {
+				if (!temp.containsKey(fila.get(fila.size()-1)))
+					temp.put(fila.get(fila.size()-1), (float) 0);
+			}
 			for (int i = 0; i < totalMeritos; i++) {
 				if (tipo.get(n).equals(ListaEjemplos.get(i).get(col))) {
 					float aux = temp.get(ListaEjemplos.get(i).get((ListaEjemplos.get(i).size())-1));
 					temp.put(ListaEjemplos.get(i).get(ListaEjemplos.get(i).size()-1), aux + 1);
 				}
 			}
-			float pi = (temp.get("si")/mapaMeritos.get(tipo.get(n)));
-			float ni = (temp.get("no")/mapaMeritos.get(tipo.get(n)));
-			float log1 = (float) (Math.log(pi)/(Math.log(2)));
-			float log2 = (float) (Math.log(ni)/(Math.log(2)));
-			Float merito = (mapaMeritos.get(tipo.get(n))/totalMeritos) * ((-pi * log1) + (-ni * log2)); 
+			Float merito = (mapaMeritos.get(tipo.get(n))/totalMeritos);
+			float operacion = 0;
+			for (String key: temp.keySet()) {
+				float pi = (temp.get(key)/mapaMeritos.get(tipo.get(n)));
+				float log = (float) (Math.log(pi)/(Math.log(2)));
+				operacion += (-pi * log);
+			}
+			//float pi = (temp.get("si")/mapaMeritos.get(tipo.get(n)));
+			//float ni = (temp.get("no")/mapaMeritos.get(tipo.get(n)));
+			//float log1 = (float) (Math.log(pi)/(Math.log(2)));
+			//float log2 = (float) (Math.log(ni)/(Math.log(2)));
+			//merito = (mapaMeritos.get(tipo.get(n))/totalMeritos) * ((-pi * log1) + (-ni * log2)); 
+			merito = merito * operacion;
 			if (merito.equals(Float.NaN))
 				merito = (float) 0;
 			resultadosInfor.add(merito);
@@ -155,10 +167,10 @@ public class ID3 {
 				}
 			}
 		}
-		if (vuelta == ListaAtributos.size() - 2) {
+		/*if (vuelta == ListaAtributos.size() - 2) {
 			int i = 0;
 			System.out.println(i);
-		}
+		}*/
 		agregarNodosSucesores(map, vuelta, resultado, ramaActual);
 		/*if (resultado.getNodoAnterior() != null) {
 			for (Nodo temp: resultado.getNodoAnterior().getListaNodosSig()) {
@@ -171,10 +183,10 @@ public class ID3 {
 	
 	private void agregarNodosSucesores(Map<String, Map<String, Integer>> map, 
 			int vuelta, Nodo nodo, String nombreNodo) {
-		if (vuelta == ListaAtributos.size() - 2) {
+		/*if (vuelta == ListaAtributos.size() - 2) {
 			int i = 0;
 			System.out.println(i);
-		}
+		}*/
 		if (nodo.getListaNodosSig() != null && nodo.getListaNodosSig().isEmpty()) {
 			nodo.setNombre(nombreNodo);
 			for (String nombre: map.keySet()) {

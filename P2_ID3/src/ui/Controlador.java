@@ -1,6 +1,7 @@
 package ui;
 
 import logica.ID3;
+import logica.Nodo;
 import logica.TransferArchivos;
 
 public class Controlador {
@@ -25,6 +26,10 @@ public class Controlador {
 		this.ui = ui;
 	}
 	
+	public Nodo getResultado() {
+		return this.algoritmo.getNodoResultado();
+	}
+	
 	public void accion(Object datos) throws Exception {
 		
 		switch(state) {
@@ -35,7 +40,6 @@ public class Controlador {
 			case LEER_JUEGO: 
 				algoritmo.cargarDatos((TransferArchivos)datos); 
 				setState(Estados.PROCESAR);
-				this.accion(null); //MODIFICAR ESTO!
 				break;
 			case PROCESAR:
 				algoritmo.procesar();

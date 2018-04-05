@@ -6,6 +6,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import logica.ID3;
+import logica.Nodo;
 import logica.TransferArchivos;
 
 public class WindowController {
@@ -25,6 +26,17 @@ public class WindowController {
 		switch (state) {
 			case LEER_ATRIB: leerArchivos(); break;
 			case LEER_JUEGO: leerArchivos(); break;
+			case PROCESAR:  try {
+				contr.accion(null);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
+			case FIN: 
+				Nodo resultado = contr.getResultado();
+				new ResultWindow(resultado).setVisible(true);
+				break;
 			default: break;
 		}
 	}
