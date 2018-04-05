@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import dao.LectorFicheros;
 
@@ -13,13 +14,13 @@ public class ID3 {
 	private LectorFicheros dao;
 	private ArrayList<String> ListaAtributos;
 	private ArrayList<ArrayList<String>> ListaEjemplos;
-	private Map<String, ArrayList<Map>> resultado;
+	private ArrayList<Nodo> resultado;
 	
 	public ID3() {
 		dao = new LectorFicheros();
 		ListaAtributos = new ArrayList<String>();
 		ListaEjemplos = new ArrayList<ArrayList<String>>();
-		resultado = new HashMap<String, ArrayList<Map>>();
+		resultado = new ArrayList<Nodo>();
 	}
 	
 	public void cargarTipos(TransferArchivos transfer) throws Exception {
@@ -47,12 +48,17 @@ public class ID3 {
 	
 	public void procesar() {
 		Map<String, Float> meritos = new HashMap<String, Float>(); 
-		for (int i = 0; i < this.ListaAtributos.size(); i++) {
-			//Map<String, Float> temp = new HashMap<String, Float>();
-			meritos.put(ListaAtributos.get(i), calcularMerito(i));
-		}
+		int vuelta = 0;
 		
-		siguienteRama(getMinKey(meritos));
+		while (!ListaAtributos.isEmpty()) {
+			for (int i = 0; i < this.ListaAtributos.size() - 1; i++) {
+				meritos.put(ListaAtributos.get(i), calcularMerito(i));
+			}
+			
+			siguienteRama(getMinKey(meritos), vuelta);
+			eliminarColumna(getMinKey(meritos));
+			vuelta++;
+		}
 		
 		/*resultado.put(getMinKey(meritos), Collections.min(meritos.values()));
 		Float temp = Collections.min(meritos.values());*/
@@ -105,7 +111,8 @@ public class ID3 {
 	private String getMinKey(Map<String, Float> map) {
 	    String minKey = null;
 	    float minValue = Float.MAX_VALUE;
-	    for(String key: ListaAtributos) {
+	    for(int i = 0; i < ListaAtributos.size() - 1; i++) {
+	    	String key = ListaAtributos.get(i);
 	        float value = map.get(key);
 	        if(value < minValue) {
 	            minValue = value;
@@ -115,7 +122,58 @@ public class ID3 {
 	    return minKey;
 	}
 	
-	private void siguienteRama(String ramaActual) {
+	private void siguienteRama(String ramaActual, int vuelta) {
+		Nodo nodo = new Nodo(vuelta, ramaActual);
+		nodo.setNodoAnterior(vuelta - 1);
+		ArrayList<String> tipo = new ArrayList<String>();
+		Map<String, Map<String, Integer>> map = new HashMap<String, Map<String, Integer>>();
+		int total = ListaEjemplos.size();
+		int col = ListaAtributos.indexOf(ramaActual);
+		for (int i = 0; i < total; i++) {
+			if (!tipo.contains(ListaEjemplos.get(i).get(col))) {
+				tipo.add(ListaEjemplos.get(i).get(col));
+				map.put(ListaEjemplos.get(i).get(col), new HashMap<String, Integer>());
+			}
+		}
+		for (int i = 0; i < tipo.size(); i++) {
+			for (int n = 0; n < ListaEjemplos.size(); n++) {
+				if (ListaEjemplos.get(n).get(col).equals(tipo.get(i))) {
+					String temp = ListaEjemplos.get(n).get(ListaAtributos.size()-1);
+					if (!map.get(tipo.get(i)).containsKey(temp)) {
+						map.get(tipo.get(i)).put(temp, 1);
+					} else {
+						Map <String, Integer> aux = map.get(tipo.get(i));
+						aux.put(temp, aux.get(temp) +1);
+					}
+				}
+			}
+		}
+		for (String nombre: tipo) {
+			Map<String, Integer> temp = map.get(nombre);
+			if (temp.size() == 1) {
+				for (String key: temp.keySet())
+					nodo.setCondicion(nombre, key);
+			} else
+				nodo.setCondicion(nombre, "null");
+		}
+		resultado.add(nodo);
+	}
+	
+	private void eliminarColumna(String ramaActual) {
+		int col = ListaAtributos.indexOf(ramaActual);
+		
+		ListaAtributos.remove(col);
+		
+		if (ListaAtributos.size() == 1) {
+			ListaAtributos.clear();
+			ListaEjemplos.clear();
+		}
+	
+		else {
+			for (ArrayList<String> temp: ListaEjemplos) {
+				temp.remove(col);
+			}
+		}
 		
 	}
 	
