@@ -50,7 +50,7 @@ public class ID3 {
 		Map<String, Float> meritos = new HashMap<String, Float>(); 
 		int vuelta = 0;
 		
-		while (!ListaAtributos.isEmpty()) {
+		while (ListaMeritos.size() != (ListaAtributos.size() - 1)) {
 			meritos.clear();
 			for (int i = 0; i < this.ListaAtributos.size() - 1; i++) {
 				if(!ListaMeritos.contains(ListaAtributos.get(i)))
@@ -61,6 +61,8 @@ public class ID3 {
 			ListaMeritos.add(getMinKey(meritos));
 			vuelta++;
 		}
+		
+		int fin = 0;
 		
 		/*resultado.put(getMinKey(meritos), Collections.min(meritos.values()));
 		Float temp = Collections.min(meritos.values());*/
@@ -114,6 +116,8 @@ public class ID3 {
 	    String minKey = null;
 	    float minValue = Float.MAX_VALUE;
 	    for(int i = 0; i < ListaAtributos.size() - 1; i++) {
+	    	if (ListaMeritos.contains(ListaAtributos.get(i)))
+	    		continue;
 	    	String key = ListaAtributos.get(i);
 	        float value = map.get(key);
 	        if(value < minValue) {
@@ -125,8 +129,8 @@ public class ID3 {
 	}
 	
 	private void siguienteRama(String ramaActual, int vuelta) {
-		Nodo nodo = new Nodo(vuelta, ramaActual);
-		nodo.setNodoAnterior(resultado);
+		if (resultado == null)
+			resultado = new Nodo(vuelta, ramaActual);
 		Map<String, Map<String, Integer>> map = new HashMap<String, Map<String, Integer>>();
 		int total = ListaEjemplos.size();
 		int col = ListaAtributos.indexOf(ramaActual);
@@ -148,34 +152,40 @@ public class ID3 {
 			}
 		}
 		//if (nodo.getListaNodosSig().size() == 0)
-		agregarNodosSucesores(map, vuelta, nodo);
-		if (nodo.getNodoAnterior() != null) {
-			for (Nodo temp: nodo.getNodoAnterior().getListaNodosSig()) {
+		agregarNodosSucesores(map, vuelta, resultado, ramaActual);
+		/*if (resultado.getNodoAnterior() != null) {
+			for (Nodo temp: resultado.getNodoAnterior().getListaNodosSig()) {
 				if (temp.getNombre() == null)
 					temp.setNombre(ramaActual);
 				temp.setNodoAnterior(resultado);
 			}
-		}
-		resultado = nodo;
+		}*/
 	}
 	
 	private void agregarNodosSucesores(Map<String, Map<String, Integer>> map, 
-			int vuelta, Nodo nodo) {
-		for (String nombre: map.keySet()) {
-			Map<String, Integer> temp = map.get(nombre);
-			if (temp.size() == 1) {
-				for (String key: temp.keySet()) {
-					Nodo nodoSiguiente = new Nodo(vuelta + 1 , key);
+			int vuelta, Nodo nodo, String nombreNodo) {
+		if (nodo.getListaNodosSig() != null && nodo.getListaNodosSig().isEmpty()) {
+			nodo.setNombre(nombreNodo);
+			for (String nombre: map.keySet()) {
+				Map<String, Integer> temp = map.get(nombre);
+				if (temp.size() == 1) {
+					for (String key: temp.keySet()) {
+						Nodo nodoSiguiente = new Nodo(vuelta + 1 , key);
+						nodoSiguiente.setAccion(nombre);
+						nodoSiguiente.setNodoSiguiente(null);
+						nodoSiguiente.setNodoAnterior(nodo);
+						nodo.setNodoSiguiente(nodoSiguiente);
+					}
+				} else {
+					Nodo nodoSiguiente = new Nodo(vuelta + 1 , null);
 					nodoSiguiente.setAccion(nombre);
-					nodoSiguiente.setNodoSiguiente(null);
-					nodo.setNodoAnterior(nodo.getNodoAnterior());
+					nodoSiguiente.setNodoAnterior(nodo);
 					nodo.setNodoSiguiente(nodoSiguiente);
 				}
-			} else {
-				Nodo nodoSiguiente = new Nodo(vuelta + 1 , null);
-				nodoSiguiente.setAccion(nombre);
-				nodo.setNodoAnterior(nodo.getNodoAnterior());
-				nodo.setNodoSiguiente(nodoSiguiente);
+			}
+		} else if (nodo.getListaNodosSig() != null){
+			for (Nodo nodoHijo: nodo.getListaNodosSig()) {
+				agregarNodosSucesores(map, vuelta, nodoHijo, nombreNodo);
 			}
 		}
 	}
