@@ -1,5 +1,6 @@
 package logica;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,21 +9,20 @@ public class Nodo {
 	private int id;
 	private String nombre;
 	private String accion;
-	private int nodoAnterior;
-	private Map<String, String> condicion;
+	private Nodo nodoAnterior;
+	private ArrayList<Nodo> listaNodosSig;
 	
 	public Nodo(int id, String nombre) {
 		this.id = (id);
 		this.nombre = (nombre);
-		this.condicion = new HashMap<String, String>();
+		this.listaNodosSig = new ArrayList<Nodo>();
 	}
 	
-	public Nodo(int id, String nombre, String accion, int nodoAnterior, Map<String, String> condicion) {
+	public Nodo(int id, String nombre, String accion, Nodo nodoAnterior) {
 		this.id = (id);
 		this.nombre = nombre;
 		this.setAccion(accion);
 		this.setNodoAnterior(nodoAnterior);
-		this.condicion = (condicion);
 	}
 
 	/**
@@ -37,6 +37,10 @@ public class Nodo {
 	 */
 	public int getId() {
 		return id;
+	}
+	
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
 	}
 
 	/**
@@ -56,29 +60,29 @@ public class Nodo {
 	/**
 	 * @return the nodoAnterior
 	 */
-	public int getNodoAnterior() {
+	public Nodo getNodoAnterior() {
 		return nodoAnterior;
 	}
 
 	/**
 	 * @param nodoAnterior the nodoAnterior to set
 	 */
-	public void setNodoAnterior(int nodoAnterior) {
-		this.nodoAnterior = nodoAnterior;
+	public void setNodoAnterior(Nodo nodoAnterior) {
+		if (nodoAnterior == null) 
+			this.nodoAnterior = null;
+		else
+			this.nodoAnterior = nodoAnterior;
 	}
 
-	/**
-	 * @return the condicion
-	 */
-	public Map<String, String> getCondicion() {
-		return condicion;
+	public ArrayList<Nodo> getListaNodosSig() {
+		return listaNodosSig;
 	}
 
-	/**
-	 * @param condicion the condicion to set
-	 */
-	public void setCondicion(String nombre, String condicion) {
-		this.condicion.put(nombre, condicion);
+	public void setNodoSiguiente(Nodo siguienteNodo) {
+		if (siguienteNodo != null)
+			this.listaNodosSig.add(siguienteNodo);
+		else
+			this.listaNodosSig = null;
 	}
 
 }

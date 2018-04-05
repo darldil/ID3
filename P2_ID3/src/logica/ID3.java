@@ -1,11 +1,9 @@
 package logica;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import dao.LectorFicheros;
 
@@ -14,13 +12,15 @@ public class ID3 {
 	private LectorFicheros dao;
 	private ArrayList<String> ListaAtributos;
 	private ArrayList<ArrayList<String>> ListaEjemplos;
-	private ArrayList<Nodo> resultado;
+	private ArrayList<String> ListaMeritos;
+	private Nodo resultado;
 	
 	public ID3() {
 		dao = new LectorFicheros();
 		ListaAtributos = new ArrayList<String>();
 		ListaEjemplos = new ArrayList<ArrayList<String>>();
-		resultado = new ArrayList<Nodo>();
+		ListaMeritos = new ArrayList<String>();
+		resultado = null;
 	}
 	
 	public void cargarTipos(TransferArchivos transfer) throws Exception {
@@ -51,12 +51,14 @@ public class ID3 {
 		int vuelta = 0;
 		
 		while (!ListaAtributos.isEmpty()) {
+			meritos.clear();
 			for (int i = 0; i < this.ListaAtributos.size() - 1; i++) {
-				meritos.put(ListaAtributos.get(i), calcularMerito(i));
+				if(!ListaMeritos.contains(ListaAtributos.get(i)))
+					meritos.put(ListaAtributos.get(i), calcularMerito(i));
 			}
 			
 			siguienteRama(getMinKey(meritos), vuelta);
-			eliminarColumna(getMinKey(meritos));
+			ListaMeritos.add(getMinKey(meritos));
 			vuelta++;
 		}
 		
@@ -124,42 +126,61 @@ public class ID3 {
 	
 	private void siguienteRama(String ramaActual, int vuelta) {
 		Nodo nodo = new Nodo(vuelta, ramaActual);
-		nodo.setNodoAnterior(vuelta - 1);
-		ArrayList<String> tipo = new ArrayList<String>();
+		nodo.setNodoAnterior(resultado);
 		Map<String, Map<String, Integer>> map = new HashMap<String, Map<String, Integer>>();
 		int total = ListaEjemplos.size();
 		int col = ListaAtributos.indexOf(ramaActual);
 		for (int i = 0; i < total; i++) {
-			if (!tipo.contains(ListaEjemplos.get(i).get(col))) {
-				tipo.add(ListaEjemplos.get(i).get(col));
+			if(!map.containsKey(ListaEjemplos.get(i).get(col)))
 				map.put(ListaEjemplos.get(i).get(col), new HashMap<String, Integer>());
-			}
 		}
-		for (int i = 0; i < tipo.size(); i++) {
+		for (String nombre: map.keySet()) {
 			for (int n = 0; n < ListaEjemplos.size(); n++) {
-				if (ListaEjemplos.get(n).get(col).equals(tipo.get(i))) {
+				if (ListaEjemplos.get(n).get(col).equals(nombre)) {
 					String temp = ListaEjemplos.get(n).get(ListaAtributos.size()-1);
-					if (!map.get(tipo.get(i)).containsKey(temp)) {
-						map.get(tipo.get(i)).put(temp, 1);
+					if (!map.get(nombre).containsKey(temp)) {
+						map.get(nombre).put(temp, 1);
 					} else {
-						Map <String, Integer> aux = map.get(tipo.get(i));
+						Map <String, Integer> aux = map.get(nombre);
 						aux.put(temp, aux.get(temp) +1);
 					}
 				}
 			}
 		}
-		for (String nombre: tipo) {
-			Map<String, Integer> temp = map.get(nombre);
-			if (temp.size() == 1) {
-				for (String key: temp.keySet())
-					nodo.setCondicion(nombre, key);
-			} else
-				nodo.setCondicion(nombre, "null");
+		//if (nodo.getListaNodosSig().size() == 0)
+		agregarNodosSucesores(map, vuelta, nodo);
+		if (nodo.getNodoAnterior() != null) {
+			for (Nodo temp: nodo.getNodoAnterior().getListaNodosSig()) {
+				if (temp.getNombre() == null)
+					temp.setNombre(ramaActual);
+				temp.setNodoAnterior(resultado);
+			}
 		}
-		resultado.add(nodo);
+		resultado = nodo;
 	}
 	
-	private void eliminarColumna(String ramaActual) {
+	private void agregarNodosSucesores(Map<String, Map<String, Integer>> map, 
+			int vuelta, Nodo nodo) {
+		for (String nombre: map.keySet()) {
+			Map<String, Integer> temp = map.get(nombre);
+			if (temp.size() == 1) {
+				for (String key: temp.keySet()) {
+					Nodo nodoSiguiente = new Nodo(vuelta + 1 , key);
+					nodoSiguiente.setAccion(nombre);
+					nodoSiguiente.setNodoSiguiente(null);
+					nodo.setNodoAnterior(nodo.getNodoAnterior());
+					nodo.setNodoSiguiente(nodoSiguiente);
+				}
+			} else {
+				Nodo nodoSiguiente = new Nodo(vuelta + 1 , null);
+				nodoSiguiente.setAccion(nombre);
+				nodo.setNodoAnterior(nodo.getNodoAnterior());
+				nodo.setNodoSiguiente(nodoSiguiente);
+			}
+		}
+	}
+	
+	/*private void eliminarColumna(String ramaActual) {
 		int col = ListaAtributos.indexOf(ramaActual);
 		
 		ListaAtributos.remove(col);
@@ -175,6 +196,6 @@ public class ID3 {
 			}
 		}
 		
-	}
+	}*/
 	
 }
