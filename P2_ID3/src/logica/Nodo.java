@@ -84,5 +84,9 @@ public class Nodo {
 		else
 			this.listaNodosSig = null;
 	}
+	
+	public void eliminarNodoSiguiente(int index) {
+		this.listaNodosSig.remove(index);
+	}
 
 }

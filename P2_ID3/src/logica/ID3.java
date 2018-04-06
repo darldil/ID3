@@ -13,6 +13,7 @@ public class ID3 {
 	private ArrayList<String> ListaAtributos;
 	private ArrayList<ArrayList<String>> ListaEjemplos;
 	private ArrayList<String> ListaMeritos;
+	private Map<String, Float> MapaDecisiones;
 	private Nodo resultado;
 	
 	public ID3() {
@@ -21,6 +22,7 @@ public class ID3 {
 		ListaEjemplos = new ArrayList<ArrayList<String>>();
 		ListaMeritos = new ArrayList<String>();
 		resultado = null;
+		MapaDecisiones = new HashMap<String, Float>();
 	}
 	
 	public void cargarTipos(TransferArchivos transfer) throws Exception {
@@ -53,6 +55,11 @@ public class ID3 {
 	public void procesar() {
 		Map<String, Float> meritos = new HashMap<String, Float>(); 
 		int vuelta = 0;
+		
+		for (ArrayList<String> fila: ListaEjemplos) {
+			if (!MapaDecisiones.containsKey(fila.get(fila.size()-1)))
+				MapaDecisiones.put(fila.get(fila.size()-1), (float) 0);
+		}
 		
 		while (ListaMeritos.size() != (ListaAtributos.size() - 1)) {
 			meritos.clear();
@@ -92,21 +99,17 @@ public class ID3 {
 		}
 		
 		for (int n = 0; n < mapaMeritos.size(); n++) {
-			Map<String, Float> temp = new HashMap<String, Float>();
-			for (ArrayList<String> fila: ListaEjemplos) {
-				if (!temp.containsKey(fila.get(fila.size()-1)))
-					temp.put(fila.get(fila.size()-1), (float) 0);
-			}
+			
 			for (int i = 0; i < totalMeritos; i++) {
 				if (tipo.get(n).equals(ListaEjemplos.get(i).get(col))) {
-					float aux = temp.get(ListaEjemplos.get(i).get((ListaEjemplos.get(i).size())-1));
-					temp.put(ListaEjemplos.get(i).get(ListaEjemplos.get(i).size()-1), aux + 1);
+					float aux = MapaDecisiones.get(ListaEjemplos.get(i).get((ListaEjemplos.get(i).size())-1));
+					MapaDecisiones.put(ListaEjemplos.get(i).get(ListaEjemplos.get(i).size()-1), aux + 1);
 				}
 			}
 			Float merito = (mapaMeritos.get(tipo.get(n))/totalMeritos);
 			float operacion = 0;
-			for (String key: temp.keySet()) {
-				float pi = (temp.get(key)/mapaMeritos.get(tipo.get(n)));
+			for (String key: MapaDecisiones.keySet()) {
+				float pi = (MapaDecisiones.get(key)/mapaMeritos.get(tipo.get(n)));
 				float log = (float) (Math.log(pi)/(Math.log(2)));
 				operacion += (-pi * log);
 			}
@@ -167,31 +170,19 @@ public class ID3 {
 				}
 			}
 		}
-		/*if (vuelta == ListaAtributos.size() - 2) {
-			int i = 0;
-			System.out.println(i);
-		}*/
 		agregarNodosSucesores(map, vuelta, resultado, ramaActual);
-		/*if (resultado.getNodoAnterior() != null) {
-			for (Nodo temp: resultado.getNodoAnterior().getListaNodosSig()) {
-				if (temp.getNombre() == null)
-					temp.setNombre(ramaActual);
-				temp.setNodoAnterior(resultado);
-			}
-		}*/
+			//eliminarRama(resultado, ramaActual);
+			
 	}
 	
 	private void agregarNodosSucesores(Map<String, Map<String, Integer>> map, 
 			int vuelta, Nodo nodo, String nombreNodo) {
-		/*if (vuelta == ListaAtributos.size() - 2) {
-			int i = 0;
-			System.out.println(i);
-		}*/
 		if (nodo.getListaNodosSig() != null && nodo.getListaNodosSig().isEmpty()) {
 			nodo.setNombre(nombreNodo);
 			for (String nombre: map.keySet()) {
 				Map<String, Integer> temp = map.get(nombre);
 				if (temp.size() == 1) {
+					//distinto++;
 					for (String key: temp.keySet()) {
 						Nodo nodoSiguiente = new Nodo(vuelta + 1 , key);
 						nodoSiguiente.setAccion(nombre);
@@ -208,16 +199,37 @@ public class ID3 {
 					Nodo nodoSiguiente = new Nodo(vuelta + 1 , null);
 					nodoSiguiente.setAccion(nombre);
 					nodoSiguiente.setNodoAnterior(nodo);
-					nodo.setNodoSiguiente(nodoSiguiente);
 					cerrarArbol(nodoSiguiente);
+					if (!nodoSiguiente.getNombre().equals("?"))
+						nodo.setNodoSiguiente(nodoSiguiente);
 				}
 			}
 		} else if (nodo.getListaNodosSig() != null){
-			for (Nodo nodoHijo: nodo.getListaNodosSig()) {
+			for (int i = 0; i < nodo.getListaNodosSig().size(); i++) {
+				Nodo nodoHijo = nodo.getListaNodosSig().get(i);
 				agregarNodosSucesores(map, vuelta, nodoHijo, nombreNodo);
+				if (nodoHijo.getListaNodosSig() != null && nodoHijo.getListaNodosSig().isEmpty() && 
+						!MapaDecisiones.containsKey(nodoHijo.getNombre())) {
+					nodoHijo.getNodoAnterior().eliminarNodoSiguiente(nodo.getListaNodosSig().indexOf(nodoHijo));
+					i = -1;
+				}
 			}
 		}
 	}
+	
+	/*private void eliminarRama(Nodo nodo, String nombreRama) {
+		if (nodo.getListaNodosSig() != null){
+			for (int i = 0; i < nodo.getListaNodosSig().size(); i++) {
+				Nodo nodoHijo = nodo.getListaNodosSig().get(i);
+				if (nodoHijo.getNombre().equals(nombreRama)) {
+					nodo.eliminarNodoSiguiente(i);
+					i = -1;
+				}
+				else
+					eliminarRama(nodoHijo, nombreRama);
+			}
+		}
+	}*/
 	
 	private void cerrarArbol(Nodo nodo) {
 		nodo.setNodoSiguiente(null);
