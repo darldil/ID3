@@ -122,6 +122,9 @@ public class ID3 {
 			if (merito.equals(Float.NaN))
 				merito = (float) 0;
 			resultadosInfor.add(merito);
+			for (String key: MapaDecisiones.keySet()) {
+				MapaDecisiones.put(key, (float) 0);
+			}
 		}
 		
 		for (int i = 0; i < resultadosInfor.size(); i++) {

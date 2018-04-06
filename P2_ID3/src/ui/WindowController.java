@@ -24,8 +24,14 @@ public class WindowController {
 	
 	public void run() {
 		switch (state) {
-			case LEER_ATRIB: leerArchivos(); break;
-			case LEER_JUEGO: leerArchivos(); break;
+			case LEER_ATRIB: 
+				JOptionPane.showMessageDialog(null, "En primer lugar, escoja el archivo de atributos");
+				leerArchivos(); 
+				break;
+			case LEER_JUEGO: 
+				JOptionPane.showMessageDialog(null, "Ahora, escoja el archivo con los datos");
+				leerArchivos(); 
+				break;
 			case PROCESAR:  try {
 				contr.accion(null);
 			} catch (Exception e) {
