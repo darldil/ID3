@@ -171,7 +171,8 @@ public class ID3 {
 				Map<String, Integer> temp = map.get(nombre);
 				if (temp.size() == 1) {
 					for (String key: temp.keySet()) {
-						Nodo nodoSiguiente = new Nodo(vuelta + 1 , key);
+						Nodo nodoSiguiente = new Nodo(vuelta + 1 ,key + " " +
+								ListaAtributos.get(ListaAtributos.size() - 1));
 						nodoSiguiente.setAccion(nombre);
 						nodoSiguiente.setNodoSiguiente(null);
 						nodoSiguiente.setNodoAnterior(nodo);
@@ -206,7 +207,6 @@ public class ID3 {
 	
 	private void cerrarArbol(Nodo nodo) {
 		nodo.setNodoSiguiente(null);
-		
 		ArrayList<String> map = new ArrayList<String>();
 		Boolean continua = true;
 		ArrayList<ArrayList<String>> filas = new ArrayList<ArrayList<String>>();
@@ -235,12 +235,10 @@ public class ID3 {
 			}
 		} 
 		if (respuestas.size() == 1) {
-			for (String key: respuestas.keySet()) {
-				nodo.setNombre(key);
-			}
+			for (String key: respuestas.keySet()) 
+				nodo.setNombre(key + " " + ListaAtributos.get(ListaAtributos.size() - 1));
 		}
 		else
 			nodo.setNombre("?");
 	}
-	
 }

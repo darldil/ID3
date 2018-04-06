@@ -51,7 +51,7 @@ public class ResultWindow extends JFrame{
 	private void inserccionRecursiva(Nodo nodo, mxGraph graph, Object parent) {
 		if (nodo.getListaNodosSig() != null) {
 			for (Nodo nodoSiguiente: nodo.getListaNodosSig()) {
-				Object v2 = graph.insertVertex(graph.getDefaultParent(), null, nodoSiguiente.getNombre(), 50, 50, 50,
+				Object v2 = graph.insertVertex(graph.getDefaultParent(), null, nodoSiguiente.getNombre(), 50, 50, 65,
 						30);
 				graph.insertEdge(graph.getDefaultParent(), null, nodoSiguiente.getAccion(), parent, v2);
 				inserccionRecursiva(nodoSiguiente, graph, v2);

@@ -69,6 +69,8 @@ public class WindowController {
 								contr.accion(transfer);
 							} catch (Exception e) {
 								e.printStackTrace(); 
+								JOptionPane.showMessageDialog(null, "Me has dado un archivo cascado. Abreme de nuevo"
+										+ "con el archivo correcto.");
 								System.exit(0);
 							}
 				      }
