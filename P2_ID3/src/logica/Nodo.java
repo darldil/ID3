@@ -6,20 +6,20 @@ public class Nodo {
 	
 	private int id;
 	private String nombre;
-	private String accion;
+	private String arista;
 	private Nodo nodoAnterior;
 	private ArrayList<Nodo> listaNodosSig;
 	
 	public Nodo(int id, String nombre) {
-		this.id = (id);
+		this.id = id;
 		this.nombre = (nombre);
 		this.listaNodosSig = new ArrayList<Nodo>();
 	}
 	
 	public Nodo(int id, String nombre, String accion, Nodo nodoAnterior) {
-		this.id = (id);
+		this.id = id;
 		this.nombre = nombre;
-		this.setAccion(accion);
+		this.setArista(accion);
 		this.setNodoAnterior(nodoAnterior);
 	}
 
@@ -44,15 +44,15 @@ public class Nodo {
 	/**
 	 * @return the accion
 	 */
-	public String getAccion() {
-		return accion;
+	public String getArista() {
+		return arista;
 	}
 
 	/**
 	 * @param accion the accion to set
 	 */
-	public void setAccion(String accion) {
-		this.accion = accion;
+	public void setArista(String accion) {
+		this.arista = accion;
 	}
 
 	/**

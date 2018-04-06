@@ -53,7 +53,7 @@ public class ResultWindow extends JFrame{
 			for (Nodo nodoSiguiente: nodo.getListaNodosSig()) {
 				Object v2 = graph.insertVertex(graph.getDefaultParent(), null, nodoSiguiente.getNombre(), 50, 50, 65,
 						30);
-				graph.insertEdge(graph.getDefaultParent(), null, nodoSiguiente.getAccion(), parent, v2);
+				graph.insertEdge(graph.getDefaultParent(), null, nodoSiguiente.getArista(), parent, v2);
 				inserccionRecursiva(nodoSiguiente, graph, v2);
 			}
 		}

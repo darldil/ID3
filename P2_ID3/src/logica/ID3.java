@@ -12,7 +12,6 @@ public class ID3 {
 	private LectorFicheros dao;
 	private ArrayList<String> ListaAtributos;
 	private ArrayList<ArrayList<String>> ListaEjemplos;
-	//private Map<String, Integer> ListaMeritos;
 	private Map<String, Float> MapaDecisiones;
 	private Nodo resultado;
 	
@@ -20,7 +19,6 @@ public class ID3 {
 		dao = new LectorFicheros();
 		ListaAtributos = new ArrayList<String>();
 		ListaEjemplos = new ArrayList<ArrayList<String>>();
-		//ListaMeritos = new HashMap<String, Integer>();
 		resultado = null;
 		MapaDecisiones = new HashMap<String, Float>();
 	}
@@ -59,21 +57,17 @@ public class ID3 {
 				MapaDecisiones.put(fila.get(fila.size()-1), (float) 0);
 		}
 		
-		//while (ListaMeritos.size() != (ListaAtributos.size() - 1)) {
-			ArrayList<String> aristas = new ArrayList<String>();
-			//meritos.clear();
-			Map<String, Integer> ListaMeritos = new HashMap<String, Integer>();
-			for (int i = 0; i < this.ListaAtributos.size() - 1; i++) {
-				//if(!ListaMeritos.containsKey(ListaAtributos.get(i)))
-					meritos.put(ListaAtributos.get(i), calcularMerito(i, aristas, ListaMeritos));
-			}
-			String minKey = getMinKey(meritos, ListaMeritos);
-			
-			ListaMeritos.put(minKey, ListaAtributos.indexOf(minKey));
-			resultado = new Nodo(vuelta, minKey);
-			resultado = siguienteRama(resultado, minKey, vuelta, aristas, ListaMeritos);
-			vuelta++;
-		//}
+		ArrayList<String> aristas = new ArrayList<String>();
+		Map<String, Integer> ListaMeritos = new HashMap<String, Integer>();
+		for (int i = 0; i < this.ListaAtributos.size() - 1; i++) {
+				meritos.put(ListaAtributos.get(i), calcularMerito(i, aristas, ListaMeritos));
+		}
+		String minKey = getMinKey(meritos, ListaMeritos);
+		
+		ListaMeritos.put(minKey, ListaAtributos.indexOf(minKey));
+		resultado = new Nodo(vuelta, minKey);
+		resultado = siguienteRama(resultado, minKey, vuelta, aristas, ListaMeritos);
+		vuelta++;
 	} 
 	
 	private float calcularMerito(int col, ArrayList<String> aristas, Map<String, Integer> ListaMeritos) {
@@ -164,16 +158,9 @@ public class ID3 {
 		Map<String, Map<String, Integer>> map = new HashMap<String, Map<String, Integer>>();
 		int total = ListaEjemplos.size();
 		int col = ListaAtributos.indexOf(ramaActual);
-		if (col == ListaAtributos.size() - 1) //MIRAR ESTO!
-			return nodo;
 		for (int i = 0; i < total; i++) {
-			try {
-				if(!map.containsKey(ListaEjemplos.get(i).get(col)))
-					map.put(ListaEjemplos.get(i).get(col), new HashMap<String, Integer>());
-			} catch(Exception e1) {
-				System.out.println(col);
-				e1.printStackTrace();
-			}
+			if(!map.containsKey(ListaEjemplos.get(i).get(col)))
+				map.put(ListaEjemplos.get(i).get(col), new HashMap<String, Integer>());
 		}
 		for (String nombre: map.keySet()) {
 			for (int n = 0; n < ListaEjemplos.size(); n++) {
@@ -197,12 +184,11 @@ public class ID3 {
 			}
 			agregarNodosSucesores(map, nombre, vuelta, nodo, ramaActual);
 		}
-		//agregarNodosSucesores(map, vuelta, nodo, ramaActual);
 		if (nodo.getListaNodosSig() != null && !nodo.getListaNodosSig().isEmpty()) {
 			for (Nodo nodoSig: nodo.getListaNodosSig()) {
 				ArrayList<String> aristas = new ArrayList<String>();
 				aristas.addAll(e);
-				aristas.add(nodoSig.getAccion());
+				aristas.add(nodoSig.getArista());
 				Map<String, Float> meritos = new HashMap<String, Float>();
 				for (int i = 0; i < this.ListaAtributos.size() - 1; i++) {
 					if(!ListaMeritos.containsKey(ListaAtributos.get(i)) && !nodo.getNombre().equals(ListaAtributos.get(i)))
@@ -222,80 +208,28 @@ public class ID3 {
 	
 	private void agregarNodosSucesores(Map<String, Map<String, Integer>> map, String nombre,  
 			int vuelta, Nodo nodo, String nombreNodo) {
-		if (nodo.getListaNodosSig() != null) { //&& nodo.getListaNodosSig().isEmpty()) {
+		if (nodo.getListaNodosSig() != null) { 
 			nodo.setNombre(nombreNodo);
-			//for (String nombre: map.keySet()) {
-				Map<String, Integer> temp = map.get(nombre);
-				if (temp.size() == 1) {
-					for (String key: temp.keySet()) {
-						Nodo nodoSiguiente = new Nodo(vuelta + 1 ,key);
-						nodoSiguiente.setAccion(nombre);
-						nodoSiguiente.setNodoSiguiente(null);
-						nodoSiguiente.setNodoAnterior(nodo);
-						nodo.setNodoSiguiente(nodoSiguiente);
-					}
-				} else if (vuelta != ListaAtributos.size() - 2){
-					Nodo nodoSiguiente = new Nodo(vuelta + 1 , null);
-					nodoSiguiente.setAccion(nombre);
+			Map<String, Integer> temp = map.get(nombre);
+			if (temp.size() == 1) {
+				for (String key: temp.keySet()) {
+					Nodo nodoSiguiente = new Nodo(vuelta, key);
+					nodoSiguiente.setArista(nombre);
+					nodoSiguiente.setNodoSiguiente(null);
 					nodoSiguiente.setNodoAnterior(nodo);
 					nodo.setNodoSiguiente(nodoSiguiente);
-				} else {
-					Nodo nodoSiguiente = new Nodo(vuelta + 1 , null);
-					nodoSiguiente.setAccion(nombre);
-					nodoSiguiente.setNodoAnterior(nodo);
-					nodo.setNombre("?");
-					//cerrarArbol(nodoSiguiente);
-					/*if (!nodoSiguiente.getNombre().equals("?"))
-						nodo.setNodoSiguiente(nodoSiguiente);*/
 				}
-		//	}
-		} /*else if (nodo.getListaNodosSig() != null){
-			for (int i = 0; i < nodo.getListaNodosSig().size(); i++) {
-				Nodo nodoHijo = nodo.getListaNodosSig().get(i);
-				agregarNodosSucesores(map, nombre, vuelta, nodoHijo, nombreNodo);
-				if (nodoHijo.getListaNodosSig() != null && nodoHijo.getListaNodosSig().isEmpty() && 
-						!MapaDecisiones.containsKey(nodoHijo.getNombre())) {
-					nodoHijo.getNodoAnterior().eliminarNodoSiguiente(nodo.getListaNodosSig().indexOf(nodoHijo));
-					i = -1;
-				}
+			} else if (vuelta != ListaAtributos.size() - 2){
+				Nodo nodoSiguiente = new Nodo(vuelta, null);
+				nodoSiguiente.setArista(nombre);
+				nodoSiguiente.setNodoAnterior(nodo);
+				nodo.setNodoSiguiente(nodoSiguiente);
+			} else {
+				Nodo nodoSiguiente = new Nodo(vuelta, null);
+				nodoSiguiente.setArista(nombre);
+				nodoSiguiente.setNodoAnterior(nodo);
+				nodo.setNombre("?");
 			}
-		}*/
+		}
 	}
-	
-	/*private void cerrarArbol(Nodo nodo) {
-		nodo.setNodoSiguiente(null);
-		ArrayList<String> map = new ArrayList<String>();
-		Boolean continua = true;
-		ArrayList<ArrayList<String>> filas = new ArrayList<ArrayList<String>>();
-		Nodo nodoAnterior = nodo.getNodoAnterior();
-		map.add(nodo.getAccion());
-		while (nodoAnterior != null && nodoAnterior.getAccion() != null){
-			map.add(nodoAnterior.getAccion());
-			nodoAnterior = nodoAnterior.getNodoAnterior();
-		}
-		for (ArrayList<String> fila: ListaEjemplos) {
-			for (int c = 0; c < fila.size() - 1 && continua; c++) {
-				String dato = fila.get(c);
-				if (!map.contains(dato))
-					continua = false;
-			} if (continua)
-				filas.add(ListaEjemplos.get(ListaEjemplos.indexOf(fila)));
-			continua = true;
-		}
-		Map<String, Integer> respuestas = new HashMap<String, Integer>();
-		for (ArrayList<String> fila: filas) { 
-			if(!respuestas.containsKey(fila.get(ListaAtributos.size() - 1)))
-				respuestas.put(fila.get(ListaAtributos.size() - 1), 1);
-			else {
-				int temp = respuestas.get(fila.get(ListaAtributos.size() - 1));
-				respuestas.put(fila.get(ListaAtributos.size() - 1), temp + 1);
-			}
-		} 
-		if (respuestas.size() == 1) {
-			for (String key: respuestas.keySet()) 
-				nodo.setNombre(key);
-		}
-		else
-			nodo.setNombre("?");
-	}*/
 }
