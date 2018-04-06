@@ -28,7 +28,6 @@ public class ID3 {
 	public void cargarTipos(TransferArchivos transfer) throws Exception {
 		List<String> list = dao.leerTipos(transfer.getRuta() + transfer.getNombre());
 		ListaAtributos.addAll(list);
-		//System.out.println(ListaAtributos);
 	}
 	
 	public void cargarDatos(TransferArchivos transfer) throws Exception {
@@ -45,7 +44,6 @@ public class ID3 {
 			n++;
 		}
 		ListaEjemplos.add(temp);
-		//System.out.println(ListaEjemplos);
 	}
 	
 	public Nodo getNodoResultado() {
@@ -71,14 +69,7 @@ public class ID3 {
 			siguienteRama(getMinKey(meritos), vuelta);
 			ListaMeritos.add(getMinKey(meritos));
 			vuelta++;
-			/*if (vuelta == ListaAtributos.size() - 2) {
-				int i = 0;
-				System.out.println(i);
-			}*/
 		}
-		
-		/*resultado.put(getMinKey(meritos), Collections.min(meritos.values()));
-		Float temp = Collections.min(meritos.values());*/
 	} 
 	
 	private float calcularMerito(int col) {
@@ -113,11 +104,6 @@ public class ID3 {
 				float log = (float) (Math.log(pi)/(Math.log(2)));
 				operacion += (-pi * log);
 			}
-			//float pi = (temp.get("si")/mapaMeritos.get(tipo.get(n)));
-			//float ni = (temp.get("no")/mapaMeritos.get(tipo.get(n)));
-			//float log1 = (float) (Math.log(pi)/(Math.log(2)));
-			//float log2 = (float) (Math.log(ni)/(Math.log(2)));
-			//merito = (mapaMeritos.get(tipo.get(n))/totalMeritos) * ((-pi * log1) + (-ni * log2)); 
 			merito = merito * operacion;
 			if (merito.equals(Float.NaN))
 				merito = (float) 0;
@@ -174,7 +160,6 @@ public class ID3 {
 			}
 		}
 		agregarNodosSucesores(map, vuelta, resultado, ramaActual);
-			//eliminarRama(resultado, ramaActual);
 			
 	}
 	
@@ -185,7 +170,6 @@ public class ID3 {
 			for (String nombre: map.keySet()) {
 				Map<String, Integer> temp = map.get(nombre);
 				if (temp.size() == 1) {
-					//distinto++;
 					for (String key: temp.keySet()) {
 						Nodo nodoSiguiente = new Nodo(vuelta + 1 , key);
 						nodoSiguiente.setAccion(nombre);
@@ -219,20 +203,6 @@ public class ID3 {
 			}
 		}
 	}
-	
-	/*private void eliminarRama(Nodo nodo, String nombreRama) {
-		if (nodo.getListaNodosSig() != null){
-			for (int i = 0; i < nodo.getListaNodosSig().size(); i++) {
-				Nodo nodoHijo = nodo.getListaNodosSig().get(i);
-				if (nodoHijo.getNombre().equals(nombreRama)) {
-					nodo.eliminarNodoSiguiente(i);
-					i = -1;
-				}
-				else
-					eliminarRama(nodoHijo, nombreRama);
-			}
-		}
-	}*/
 	
 	private void cerrarArbol(Nodo nodo) {
 		nodo.setNodoSiguiente(null);
